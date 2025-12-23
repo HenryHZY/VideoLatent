@@ -182,12 +182,62 @@ def multiple_input_images_test_preprocess_function(sample):
 
     return conversations
 
+def single_input_video_preprocess_function(sample):
+    # TODO-ZY: add prompt, add latent supervision
+    conversations = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "video", "video": sample["video_input"]},
+                {"type": "text", "text": sample["text_input"]},
+            ],
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {"type": "text", "text": sample["text_output"]},
+                ],
+        }
+    ]
+    return conversations
+
+def single_input_video_multiple_input_images_preprocess_function(sample):
+    # TODO-ZY: add prompt, add latent supervision
+    PROMPT = ""
+    # Multiple input images
+    user_content = []
+    for image in sample['image_input']:
+        original_image = Image.open(image).convert("RGB")
+        user_content.append({"type": "image", "image": original_image})
+    user_content.append({"type": "text", "text": sample["text_input"]+PROMPT})
+        
+    conversations = [
+        {
+            "idx": sample['idx'] # TODO-ZY: to find corresponding latent supervision
+        },
+        {
+            "role": "user", 
+            "content": user_content
+        }, 
+        {
+            "role": "assistant", 
+            "content": [
+                {"type": "text", "text": sample["text_output"]}
+                ],
+        },
+    ]
+    
+    return conversations
+
+
 task_preporcess_config = {
     'vsp-spatial-reasoning': single_input_image_preprocess_function,
     'vsp-spatial-planning': single_input_image_preprocess_function,
     'blink-jigsaw': multiple_input_images_preprocess_function,
     'sat': multiple_input_images_preprocess_function,
     'mindcube': vggt_multiple_input_images_preprocess_function,
+    'video': single_input_video_preprocess_function,
+    'video_multi_images': single_input_video_multiple_input_images_preprocess_function,
 }
 
 task_test_preporcess_config = {
@@ -196,6 +246,8 @@ task_test_preporcess_config = {
     'blink-jigsaw': multiple_input_images_test_preprocess_function,
     'sat': multiple_input_images_test_preprocess_function,
     'mindcube': vggt_multiple_input_images_preprocess_function,
+    'video': single_input_video_preprocess_function,
+    'video_multi_images': single_input_video_multiple_input_images_preprocess_function,
 }
 
 # Define VSP valid actions and their corresponding (row, column) changes.
