@@ -1,0 +1,11 @@
+deepspeed --num_gpus=8 src/main_deepspeed.py \
+    --model ../../models/Qwen2.5-VL-3B-Instruct \
+    --epochs 10 \
+    --task mindcube \
+    --latent_size 12 \
+    --stage stage1 \
+    --data_path ../../data/data_output3d_begin_10k_resized.jsonl \
+    --log_file ./log.txt \
+    --save_model_path ../../models/3dthinker_deepspeed \
+    --wandb_name supervised_mindcube_10k_deepspeed \
+    --deepspeed_config deepspeed_config.json
